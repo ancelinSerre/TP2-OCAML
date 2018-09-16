@@ -7,7 +7,7 @@
 **Cours utiles pour ce TP:**
 - [Cours 1](http://www-verimag.imag.fr/~wack/APF/Cours01.pdf)
 - [Cours 2](http://www-verimag.imag.fr/~wack/APF/Cours02.pdf)
-  
+
 *Note: un fichier OCaml (.ml) est présent dans le dépôt afin de jouer nos bouts de codes plus rapidement.*
 
 -----
@@ -43,7 +43,7 @@ let inventaire = [
 ];;
 
 (* Fonction fragiles *)
-let rec fragiles inventaire = 
+let rec fragiles inventaire =
     match inventaire with
     | [] -> 0
     | (contenu, solidite, poids)::s ->
@@ -55,11 +55,11 @@ let rec fragiles inventaire =
 Faire une fonction `legers` qui prend en paramètre un poids et l'inventaire et rend la liste des paquets pesant au plus ce poids.
 
 ```ocaml
-let rec legers p inventaire = 
+let rec legers p inventaire =
     match inventaire with
     | [] -> []
     | (contenu, solidite, poids)::s ->
-        if poids <= p then 
+        if poids <= p then
             (contenu, solidite, poids)::legers p s
         else
             legers p s;;
@@ -70,13 +70,13 @@ let rec legers p inventaire =
 Ecrire une fonction `poids_plantes` qui indique le poids et l'inventaire et rend la liste de paquets au plus ce poids.
 
 ```ocaml
-let rec poids_plantes inventaire = 
+let rec poids_plantes inventaire =
     match inventaire with
     | [] -> 0
-    | (contenu, solidite , poids)::s -> 
-        if contenu = Plante then 
+    | (contenu, solidite , poids)::s ->
+        if contenu = Plante then
             poids + poids_plantes s
-        else 
+        else
             0 + poids_plantes s;;
 ```
 
@@ -85,7 +85,7 @@ let rec poids_plantes inventaire =
 Faire une fonction `exposition` qui retire tous les cadres d'un inventaire.
 
 ```ocaml
-let rec exposition inventaire = 
+let rec exposition inventaire =
     match inventaire with
     | [] -> []
     | (contenu, solidite, poids)::s ->
@@ -100,7 +100,7 @@ let rec exposition inventaire =
 Ecrire une fonction `inventorie` qui insère un paquet dans un inventaire par ordre croissant de poids. Nous supposons que l'inventaire est ordonné.
 
 ```ocaml
-let rec inventorie inventaire (nc,ns,np) = 
+let rec inventorie inventaire (nc,ns,np) =
     match inventaire with
     | [] -> [(nc, ns, np)]
     | (contenu, solidite, poids)::next ->
@@ -120,7 +120,7 @@ let rec dromadaire inventaire =
     | [] -> failwith "Aucun paquet dans l'inventaire !"
     | (contenu, solidite, poids)::[] -> (contenu, solidite, poids)
     | (contenu, solidite, poids)::next ->
-        let (nc, ns, np) = dromadaire next in 
+        let (nc, ns, np) = dromadaire next in
             if poids > np then
                 (contenu, solidite, poids)
             else
@@ -132,8 +132,106 @@ let rec dromadaire inventaire =
 Ecrire une fonction `chameau` qui prend l'inventaire en paramètre et indique les deux plus lourds paquets.
 
 ```ocaml
-let rec chameau inventaire = 
-     
- 
+let rec chameau inventaire =
 
+
+
+```
+
+## Exercice 25
+
+Definir les types adaptés à la situation du magasin Tardy.
+
+```ocaml
+type genre = MP3 | Camera | Photo | Telephone | PC;;
+type marque = Apple | Samsung | Sony | Lipship ;;
+```
+
+## Exercice 26
+
+Écrire une fonction est en stock qui indique si un élément est présent en stock (c’est- à-dire si le nombre d’articles disponibles est strictement positif). Elle prend en argument un produit, une marque et un prix (caractéristiques de l’élément) et la liste des articles répertoriés.
+
+```ocaml
+let rec est_en_stock l marque genre prix =
+  match l with
+  | [] -> false
+  | (m,g,p,s)::next -> if(m = marque && genre = g && prix = p && s > 0) then true else est_en_stock next marque genre prix;;
+```
+
+## Exercice 27
+
+Écrire une fonction ajoute article qui ajoute un article dans la liste, en vérifiant qu’il n’y est pas déjà, et s’il y est déjà, modifie le nombre d’éléments en stock dans la liste en additionnant le nombre en stock de l’argument article. Elle prend en argument un article et la liste des articles répertoriés.
+
+```ocaml
+let rec ajouter l (marque,genre,prix,stock) =
+  match l with
+  | [] -> [(marque,genre,prix,stock)]
+  | (m,g,p,s)::next -> if(m = marque && genre = g && prix = p && s > 0) then s = s + stock else ajouter next (marque,genre,prix,stock);;
+```
+
+
+## Exercice 28
+
+Écrire une fonction enleve article qui enlève un article de la liste. Elle prend en argument la liste des articles répertoriés et l’article à enlever.
+
+```ocaml
+let rec enlever l marque genre =
+  match l with
+  | [] -> failwith "L'article n'est pas en rayon !"
+  | (m,g,p,s)::next ->
+    if m = marque && g = genre then
+      next
+    else
+      (m,g,p,s)::enlever next marque genre;;
+```
+
+## Exercice 29
+
+Écrire une fonction ces produits qui prend en argument un produit et une liste d’articles et renvoie la liste des articles qui conviennent dans la liste d’articles (ex : ces produits(MP3,L) renvoie tous les MP3 présents dans L).
+
+```ocaml
+let rec ces_produit l gm =
+    match l with
+    | [] -> []
+    | (marque, genre, prix, stock)::next ->
+        if gm = genre then
+            (marque, genre, prix, stock)::ces_produit next gm
+        else
+            ces_produit next gm;;
+```
+
+## Exercice 30
+
+Marc se rend compte que les clients choisissent généralement le deuxième produit le moins cher, i.e. si l’on classe tous les produits de la liste par ordre de prix croissant, le deuxième produit de cette liste. Sans classer tous les articles correspondant à un même produit par ordre croissant, écrivez une fonction deuxieme moins cher qui prend en argument une liste d’articles répertoriés, un produit, et renvoie le choix préféré des clients.
+
+```ocaml
+let rec deuxieme l genre =
+  match l with
+  | [] -> failwith "L'article n'est pas en rayon !"
+  | (m,g,p,s)::[] ->
+    if g = genre then
+      [(m,g,p,s)]
+   else
+      failwith "L'article n'est pas en rayon !"
+  | (m,g,p,s)::(m1,g1,p1,s1)::next ->
+    if g = genre && g1 = genre then
+      [(m1,g1,p1,s1)]
+    else if g = genre && g1 != genre then
+      deuxieme ((m1,g1,p1,s1)::next) genre
+    else deuxieme next genre;;
+```
+
+## Exercice 31
+
+Écrire une fonction budget qui prend en argument deux entiers m, budget minimal, et M budget maximal, ainsi qu’une liste d’articles, et renvoie la liste des articles compris dans ce budget (i.e. dont le prix p est tel que m≤p≤M).
+
+```ocaml
+let rec budget l pmin pmax =
+    match l with
+    | [] -> []
+    | (marque, genre, prix, stock)::next ->
+        if prix >= pmin && prix <= pmax then
+            (marque, genre, prix, stock)::budget next pmin pmax
+        else
+            budget next pmin pmax;;
 ```
