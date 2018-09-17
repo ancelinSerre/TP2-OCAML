@@ -235,3 +235,70 @@ let rec budget l pmin pmax =
         else
             budget next pmin pmax;;
 ```
+
+## Exercice 32
+
+Écrire une fonction achete qui prend en argument une liste d’articles et les nom de produit, marque et prix pour un élément, et fait diminuer de 1 la quantité en stock d’un article.
+
+
+```ocaml
+let rec achete l marque genre prix =
+  match l with
+  | [] -> failwith "L'article n'est pas en rayon !"
+  | (m,g,p,s)::next ->
+    if(marque = m && genre = g && p = prix) then
+      [(m,g,p,s-1)]
+    else
+      achete next marque genre prix;;
+```
+
+## Exercice 33
+
+Écrire une fonction commande qui prend en argument la liste des articles et renvoie la liste des articles à commander au fournisseur (ceux dont le nombre en stock est nul).
+
+```ocaml
+let rec commande l =
+  match l with
+  | [] -> []
+  | (m,g,p,s)::next ->
+    if s = 0 then
+      (m,g,p,s)::commande next
+    else
+      commande next;;
+```
+
+## Exercice 34
+
+Écrire une fonction trouve min de type article list → article * article list qui calcule l’article le moins cher d’une liste non vide ainsi que la liste privée de cet article.
+
+```ocaml
+let rec trouve_min l =
+    match l with
+    | [] -> failwith "Aucun article en rayon!"
+    | (marque, genre, prix, stock)::[] -> (marque, genre, prix, stock)
+    | (marque, genre, prix, stock)::next ->
+        let (m,g,p,s) = trouve_min next in
+            if prix < p then
+                (marque, genre, prix, stock)
+            else
+                (m,g,p,s);;
+```
+
+## Exercice 35
+
+Écrire une fonction tri selection de type article list → article list qui trie la liste donnée en entrée par prix croissant en suivant l’algorithme du tri par sélection.
+
+```ocaml
+let rec tri_selection l =
+  match l with
+  | [] -> []
+  | (m,g,p,s)::[] -> [(m,g,p,s)]
+  | (m,g,p,s)::next ->
+    let (marque,genre,prix,stock) = trouve_min next in
+      if prix < p then
+        (marque,genre,prix,stock)::(tri_selection next)
+      else
+        (m,g,p,s)::(tri_selection next);;
+    TODO - NE fonctionne pas
+
+```
